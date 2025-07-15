@@ -1,0 +1,56 @@
+{
+  "name": "Agentic Sales Automation",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-sales",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Normalize and sanitize input\nconst data = items[0].json;\nreturn [{ json: { input: data.body || data } }];"
+      },
+      "name": "Preprocess Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "chain": "groq-intent-chain",
+        "input": "={{$json.input}}"
+      },
+      "name": "Intent Detection",
+      "type": "n8n-nodes-langchain.llm",
+      "typeVersion": 1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "value1": "={{$json.intent}}",
+        "rules": [
+          { "operation": "equals", "value2": "Market Trend" },
+          { "operation": "equals", "value2": "Sales Forecast" },
+          { "operation": "equals", "value2": "Low Stock Alert" }
+        ]
+      },
+      "name": "Switch Intent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [ [ { "node": "Preprocess Input", "type": "main", "index": 0 } ] ] },
+    "Preprocess Input": { "main": [ [ { "node": "Intent Detection", "type": "main", "index": 0 } ] ] },
+    "Intent Detection": { "main": [ [ { "node": "Switch Intent", "type": "main", "index": 0 } ] ] }
+  }
+}

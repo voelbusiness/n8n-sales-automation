@@ -1,0 +1,9 @@
+name: CI/CD
+on: [push]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Server
+        run: ssh deploy@server 'cd /app && git pull && docker-compose up -d'

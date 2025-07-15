@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - LANGCHAIN_API_KEY=${GROQ_API_KEY}
+    ports:
+      - '5678:5678'
+    volumes:
+      - ./n8n:/home/node/.n8n
